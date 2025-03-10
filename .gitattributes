@@ -1,0 +1,9 @@
+
+*.uasset
+*.umap
+*.pch
+*.json
+Binaries/**
+DerivedDataCache/**
+Intermediate/**
+Saved/** filter=lfs diff=lfs merge=lfs -text
