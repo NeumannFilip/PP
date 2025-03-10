@@ -12,15 +12,30 @@ class PP_API AGridManager : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	AGridManager();
 
+	//Number of cells along x-axis
+	UPROPERTY(EditAnywhere, Category = "Grid Settings")
+	int32 GridSizeX = 10;
+
+	//Y-Axis
+	UPROPERTY(EditAnywhere, Category = "Grid Settings")
+	int32 GridSizeY = 10;
+
+	UPROPERTY(EditAnywhere, Category = "Grid Settings")
+	float CellSize = 100.f;
+
+	//2D array to track cell occupancy (true = occupied, false  = free)
+	TArray<TArray<bool>> GridCells;
+
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+public:
 
+	bool GetGridCoordinates(const FVector& WorldLocation, int32& OutGridX, int32& OutGridY) const;
+
+	bool IsCellFree(int32 GridX, int32 GridY) const;
+
+	void OccupyCell(int32 GridX, int32 GridY);
 };
