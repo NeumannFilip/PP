@@ -19,6 +19,6 @@ public:
 	UStaticMeshComponent* MeshComponent;
 
 	//on place building
-	void OnPlaced(int32 GridX, int32 GridY);
+	void OnPlaced(FVector& Location);
 	
 };

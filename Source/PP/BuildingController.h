@@ -2,10 +2,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "InputMappingContext.h"
 #include "BuildingController.generated.h"
 
 class ABuildableActor;
-class AGridManager;
+class UInputHandler;
 
 UCLASS()
 class PP_API ABuildingController : public APlayerController
@@ -17,10 +18,26 @@ public:
 
 	void OnLeftClick();
 
-	UPROPERTY(EditAnywhere, Category = "Building")
+	UPROPERTY(EditAnywhere, Category="Building")
 	TSubclassOf<ABuildableActor> BuildingToPlace;
 
+	UPROPERTY()
+	UInputHandler* InputHandler;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UInputMappingContext* DefaultMappingContext;
+
+	UFUNCTION(BlueprintCallable, Category = "Building")
+	void SpawnBuilding(TSubclassOf<ABuildableActor> BuildingClass);
+	
 private:
-	AGridManager* GetGridManager() const;
+
+	void BeginPlay() override;
+	void SetupInput();
+
+	
+	
+	//World mouse location
+	bool GetMouseWorldLocation(FVector& OutLocation) const;
 	
 };

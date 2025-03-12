@@ -1,11 +1,9 @@
-
-
-
 #include "BuildingController.h"
-
 #include "BuildableActor.h"
-#include "GridManager.h"
-#include "Kismet/GameplayStatics.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "InputHandler.h"
+
 
 void ABuildingController::SetupInputComponent()
 {
@@ -16,32 +14,61 @@ void ABuildingController::SetupInputComponent()
 
 void ABuildingController::OnLeftClick()
 {
-	AGridManager* GridManager = GetGridManager();
-	if (!GridManager || !BuildingToPlace) return;
 
-	// Get mouse position in the world
-	FHitResult HitResult;
-	GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
-
-	// Convert world location to grid coordinates
-	int32 GridX, GridY;
-	if (GridManager->GetGridCoordinates(HitResult.Location, GridX, GridY))
-	{
-		if (GridManager->IsCellFree(GridX, GridY))
-		{
-			// Spawn the building
-			FVector SpawnLocation = FVector(GridX * GridManager->CellSize, GridY * GridManager->CellSize, 0);
-			ABuildableActor* NewBuilding = GetWorld()->SpawnActor<ABuildableActor>(BuildingToPlace, SpawnLocation, FRotator::ZeroRotator);
-			NewBuilding->OnPlaced(GridX, GridY);
-
-			// Mark the cell as occupied
-			GridManager->OccupyCell(GridX, GridY);
-		}
-	}
-	
 }
 
-AGridManager* ABuildingController::GetGridManager() const
+
+void ABuildingController::SpawnBuilding(TSubclassOf<ABuildableActor> BuildingClass)
 {
-	return Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
+	if(!BuildingToPlace) return;
+
+	//World Location under mouse cursor
+	FVector MouseLocation;
+	if(GetMouseWorldLocation(MouseLocation))
+	{
+		if(ABuildableActor* NewBuilding = GetWorld()->SpawnActor<ABuildableActor>(BuildingToPlace, MouseLocation, FRotator::ZeroRotator))
+		{
+			NewBuilding->OnPlaced(MouseLocation);
+		}
+	}
+}
+
+void ABuildingController::BeginPlay()
+{
+	Super::BeginPlay();
+	if (!InputHandler)
+	{
+		InputHandler = NewObject<UInputHandler>(this);
+	}
+
+	// Set up input
+	SetupInput();
+}
+
+void ABuildingController::SetupInput()
+{
+	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent))
+	{
+		// Bind input actions
+		InputHandler->BindInputActions(EnhancedInputComponent, this);
+
+		// Add input mapping context
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
+		{
+			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+		}
+
+		
+	}
+}
+
+bool ABuildingController::GetMouseWorldLocation(FVector& OutLocation) const
+{
+	FHitResult HitResult;
+	if(GetHitResultUnderCursor(ECC_Visibility, false, HitResult))
+	{
+		OutLocation = HitResult.Location;
+		return true;
+	}
+	return false;
 }

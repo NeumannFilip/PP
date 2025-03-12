@@ -9,14 +9,14 @@ ABuildableActor::ABuildableActor()
 {
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComponent"));
 	RootComponent = MeshComponent;
-	PrimaryActorTick.bCanEverTick = true;
 
+	MeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	MeshComponent->SetCollisionObjectType(ECC_WorldStatic);
 }
 
-void ABuildableActor::OnPlaced(int32 GridX, int32 GridY)
+void ABuildableActor::OnPlaced(FVector& Location)
 {
-	// Logic to snap to grid or update visuals
-	// (Optional: Snap to the grid cell's center)
+	SetActorLocation(Location);
 }
 
 
