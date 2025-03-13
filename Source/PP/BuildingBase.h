@@ -25,6 +25,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="Building")
 	float ConstructionTime;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UStaticMeshComponent* MeshComponent;
+	
 	virtual void InitializeBuilding();
 	
 	virtual void Tick(float DeltaTime) override;

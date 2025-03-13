@@ -1,5 +1,6 @@
 #include "BuildingController.h"
 #include "BuildableActor.h"
+#include "BuildingBase.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputHandler.h"
@@ -14,7 +15,14 @@ void ABuildingController::SetupInputComponent()
 
 void ABuildingController::OnLeftClick()
 {
+	if (TownhallBP)
+	{
+		// Update the ghost mesh for the Townhall
+		UpdateGhostMesh(TownhallBP);
 
+		// Spawn the Townhall
+		SpawnBuilding(TownhallBP);
+	}
 }
 
 
@@ -33,6 +41,29 @@ void ABuildingController::SpawnBuilding(TSubclassOf<ABuildableActor> BuildingCla
 	}
 }
 
+void ABuildingController::UpdateGhostMesh(TSubclassOf<ABuildingBase> BuildingClass)
+{
+	if(!BuildingClass) return;
+
+	ABuildingBase* DefaultBuilding = BuildingClass.GetDefaultObject();
+	if(DefaultBuilding && DefaultBuilding->MeshComponent)
+	{
+		//Creating mesh if it doesn't exist
+		if(!GhostMesh)
+		{
+			GhostMesh = NewObject<UStaticMeshComponent>(this);
+			GhostMesh->RegisterComponent();
+		}
+
+		GhostMesh->SetStaticMesh(DefaultBuilding->MeshComponent->GetStaticMesh());
+		FVector MouseLocation;
+		if(GetMouseWorldLocation(MouseLocation))
+			GhostMesh->SetWorldLocation(MouseLocation);
+		
+		GhostMesh->SetVisibility(true);
+	}
+}
+
 void ABuildingController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -43,6 +74,10 @@ void ABuildingController::BeginPlay()
 
 	// Set up input
 	SetupInput();
+
+	GhostMesh = NewObject<UStaticMeshComponent>(this);
+	GhostMesh->RegisterComponent();
+	GhostMesh->SetVisibility(false);
 }
 
 void ABuildingController::SetupInput()

@@ -18,6 +18,3 @@ void ABuildableActor::OnPlaced(FVector& Location)
 {
 	SetActorLocation(Location);
 }
-
-
-

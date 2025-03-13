@@ -4,9 +4,9 @@
 
 ABuildingBase::ABuildingBase()
 {
-
 	PrimaryActorTick.bCanEverTick = true;
-
+	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComponent"));
+	RootComponent = MeshComponent;
 }
 
 void ABuildingBase::BeginPlay()

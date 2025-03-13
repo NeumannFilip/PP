@@ -5,6 +5,7 @@
 #include "InputMappingContext.h"
 #include "BuildingController.generated.h"
 
+class ABuildingBase;
 class ABuildableActor;
 class UInputHandler;
 
@@ -29,6 +30,18 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Building")
 	void SpawnBuilding(TSubclassOf<ABuildableActor> BuildingClass);
+
+	
+	
+	void UpdateGhostMesh(TSubclassOf<ABuildingBase> BuildingClass);
+
+	template <class T>
+	T* GetController() const
+	{
+		static_assert(TPointerIsConvertibleFromTo<T, AController>::Value, "'T' template parameter to GetController must be derived from AController");
+		return Cast<T>(GetOwner());
+	}
+
 	
 private:
 
@@ -39,5 +52,15 @@ private:
 	
 	//World mouse location
 	bool GetMouseWorldLocation(FVector& OutLocation) const;
+
+
+	//Buildings
+	UPROPERTY(EditDefaultsOnly, Category="Buildings")
+	TSubclassOf<ABuildableActor> TownhallBP;
+	UPROPERTY(EditDefaultsOnly, Category="Buildings")
+	TSubclassOf<ABuildingBase> HouseBP;
 	
+	//Pre-view aka GhostMesh
+	UPROPERTY()
+	UStaticMeshComponent* GhostMesh;
 };
