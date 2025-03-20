@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "InputActionValue.h"
 #include "GameFramework/Pawn.h"
 #include "PPCamera.generated.h"
 
@@ -24,7 +25,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	void MoveCamera(const FInputActionValue& Value);
-	void ZoomCamera(const FInputActionValue& Value);
+	void ZoomCamera(const FInputActionValue& Value); 
 	void RotateCamera(const FInputActionValue& Value);
 
 

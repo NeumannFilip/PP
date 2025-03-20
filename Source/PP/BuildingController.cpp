@@ -18,7 +18,7 @@ void ABuildingController::OnLeftClick()
 	if (TownhallBP)
 	{
 		// Update the ghost mesh for the Townhall
-		UpdateGhostMesh(TownhallBP);
+		//UpdateGhostMesh(TownhallBP);
 
 		// Spawn the Townhall
 		SpawnBuilding(TownhallBP);
@@ -92,8 +92,6 @@ void ABuildingController::SetupInput()
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
-
-		
 	}
 }
 
