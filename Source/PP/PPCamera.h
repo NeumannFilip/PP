@@ -12,6 +12,49 @@ class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
+class UFloatingPawnMovement;
+
+USTRUCT(BlueprintType)
+struct FAxisDirectionData
+{
+	GENERATED_BODY()
+
+	FAxisDirectionData() {};
+	FAxisDirectionData(bool bVal) { bPositive = bVal; };
+
+	UPROPERTY(BlueprintReadWrite)
+	bool bPositive{true};
+
+	float GetSign() const
+	{
+		return bPositive ? 1.0 : -1.0;
+	}
+};
+
+
+USTRUCT(BlueprintType)
+struct F2DAxisDirectionData
+{
+	GENERATED_BODY()
+
+	F2DAxisDirectionData() {};
+
+	F2DAxisDirectionData(bool bX, bool bY)
+	{
+		X = bX;
+		Y = bY;
+	}
+	
+	UPROPERTY(BlueprintReadWrite)
+	FAxisDirectionData X;
+	UPROPERTY(BlueprintReadWrite)
+	FAxisDirectionData Y;
+
+	FVector2D GetSigns() const
+	{
+		return FVector2D(X.GetSign(), Y.GetSign());
+	}
+};
 
 UCLASS()
 class PP_API APPCamera : public APawn
@@ -58,6 +101,11 @@ protected:
 	float GetZoom() const;
 	float GetZoomFraction() const;
 
+
+	UFUNCTION(BlueprintCallable)
+	void SetDefaultRotation(float ZRotation);
+	UFUNCTION(BlueprintCallable)
+	void SetEdgeScrollEnabled(bool bEnabled);
 
 	UPROPERTY(BlueprintReadOnly, Category=Focus)
 	bool bFocusing{false};
@@ -114,7 +162,7 @@ private:
 	UPROPERTY()
 	float ZoomCache = -1;
 
-
+public:
 	//Components
 	UPROPERTY(VisibleAnywhere, Category="Camera")
 	USpringArmComponent* SpringArm;
@@ -126,7 +174,28 @@ private:
 	USceneComponent* TransformTarget;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Camera")
 	USceneComponent* ArmRoot;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Components)
+	UFloatingPawnMovement* FloatingPawnMovement;
 
+	//settings 
+
+
+	UPROPERTY(BlueprintReadOnly, Category="Settings")
+	float GlobalSpeedMultiplier{1};
+	UPROPERTY(BlueprintReadOnly, Category="Settings")
+	float MouseSpeedMultiplier{1};
+	UPROPERTY(BlueprintReadOnly, Category="Settings")
+	bool bSettingsEdgeScroll{true};
+	UPROPERTY(BlueprintReadOnly, Category="Settings|InvertAxis")
+	F2DAxisDirectionData MovementDirectionData;
+	UPROPERTY(BlueprintReadOnly, Category="Settings|InvertAxis")
+	F2DAxisDirectionData MousePanDirectionData;
+	UPROPERTY(BlueprintReadOnly, Category="Settings|InvertAxis")
+	FAxisDirectionData ZoomDirection;
+	UPROPERTY(BlueprintReadOnly, Category="Settings|InvertAxis")
+	FAxisDirectionData DigitalRotationDirection;
+	UPROPERTY(BlueprintReadOnly, Category="Settings|InvertAxis")
+	F2DAxisDirectionData AnalogRotationDirection;
 
 	//setup
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Setup|Camera")

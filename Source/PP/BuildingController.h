@@ -5,6 +5,7 @@
 #include "InputMappingContext.h"
 #include "BuildingController.generated.h"
 
+class UPlayerMappableInputConfig;
 class ABuildingBase;
 class ABuildableActor;
 class UInputHandler;
@@ -27,6 +28,9 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputMappingContext* DefaultMappingContext;
+
+	UPROPERTY(EditDefaultsOnly)
+	TArray<UPlayerMappableInputConfig*> DefaultInputConfigs;
 
 	UFUNCTION(BlueprintCallable, Category = "Building")
 	void SpawnBuilding(TSubclassOf<ABuildableActor> BuildingClass);

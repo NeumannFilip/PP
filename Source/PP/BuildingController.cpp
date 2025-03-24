@@ -10,7 +10,18 @@ void ABuildingController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	///InputComponent->BindAction("LeftClick", IE_Pressed, this, ABuildingController::OnLeftClick());
+	if(UEnhancedInputLocalPlayerSubsystem* InputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
+	{
+		for (const auto* InputConfig : DefaultInputConfigs)
+		{
+			InputSubsystem->AddPlayerMappableConfig(InputConfig);
+		}
+
+		if(UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent))
+		{
+			//debug actions or something
+		}
+	}
 }
 
 void ABuildingController::OnLeftClick()
