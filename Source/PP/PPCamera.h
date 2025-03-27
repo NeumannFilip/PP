@@ -63,6 +63,11 @@ class PP_API APPCamera : public APawn
 
 public:
 	APPCamera();
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGenericCameraDelegate);
+
+	UPROPERTY(BlueprintAssignable)
+	FGenericCameraDelegate OnFocusTargetReached;
 	
 	//default classes
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -75,7 +80,18 @@ protected:
 	virtual void BeginPlay() override;
 
 	void AddCameraMovementInput(FVector2D InputVector);
+	void InterpolateToFocusLocation(float DeltaTime);
+	void CalculateAndAddEdgeScrollInput();
+	void InterpolateToTransformAnchorLocation(float DeltaTime);
+	void InterpolateToDesiredCameraPitch(float DeltaTime);
 
+	void InterpolateToTransformAnchorRotation(float DeltaTime);
+	float GetDesiredCameraPitch() const;
+	void InterpolateToZoomTarget(float DeltaTime);
+
+	void AddCameraOffsetDirectly(FVector Offset);
+	const FVector2D& GetZoomRange() const;
+	
 	UFUNCTION(BlueprintCallable, meta=(AdvancedDisplay=bInstant))
 	void FocusOnActor(AActor* FocusedActor, bool bInstant = false);
 	UFUNCTION(BlueprintCallable, meta=(AdvancedDisplay=bInstant))
@@ -90,6 +106,14 @@ protected:
 	void ResetZoomToDefault();
 	UFUNCTION(BlueprintCallable)
 	void TeleportToLocation(FVector Location);
+
+	UFUNCTION(Category=Input)
+	void PanSwitchStarted();
+	UFUNCTION(Category=Input)
+	void PanSwitchCompleted();
+	UFUNCTION(Category=Input)
+	void PanInputTriggered(const FInputActionValue& ActionValue);
+	
 	
 	UFUNCTION(BlueprintCallable)
 	void DigitalRotateCamera(float Input);
@@ -141,7 +165,10 @@ protected:
 	UInputAction* MouseRotateSwitchAction;
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="Input")
 	UInputAction* ZoomAction;
-
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Input)
+	UInputAction* PanSwitchAction;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Input)
+	UInputAction* PanAction;
 	
 	
 private:
@@ -196,6 +223,7 @@ public:
 	FAxisDirectionData DigitalRotationDirection;
 	UPROPERTY(BlueprintReadOnly, Category="Settings|InvertAxis")
 	F2DAxisDirectionData AnalogRotationDirection;
+
 
 	//setup
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Setup|Camera")
